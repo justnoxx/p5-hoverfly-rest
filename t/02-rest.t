@@ -2,7 +2,9 @@ use strict;
 use warnings;
 use Data::Dumper;
 use Hoverfly::REST;
-use Test::More tests => 2;
+use JSON;
+
+use Test::More tests => 3;
 
 my $hoverfly = Hoverfly::REST->new();
 
@@ -12,3 +14,6 @@ is ($new_mode, 'capture', 'Switching to capture mode.');
 my $mode = $hoverfly->get_mode();
 is ($mode, 'capture', 'Getting mode');
 
+my $simulation = $hoverfly->get_simulation();
+
+ok(decode_json($simulation), 'Simulation is a valid JSON');

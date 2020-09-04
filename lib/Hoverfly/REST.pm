@@ -26,6 +26,20 @@ sub new {
     return $self;
 }
 
+sub get_simulation {
+    my ($self, $opts) = @_;
+
+    my $resp = $self->request(GET => 'simulation', undef, {as_string => 1});
+
+    return $resp;
+}
+
+sub set_simulation {
+    my ($self, $simulation) = @_;
+
+    my $resp = $self->request(PUT => 'simulation', $simulation);
+    return 1;
+}
 sub get_mode {
     my ($self) = @_;
 
@@ -35,7 +49,7 @@ sub get_mode {
 }
 
 sub switch_mode {
-    my ($self, $new_mode, $args) = @_;
+    my ($self, $new_mode, $args, $opts) = @_;
 
     my $content = {
         mode => $new_mode
@@ -47,7 +61,7 @@ sub switch_mode {
     return $data->{mode};
 }
 sub request {
-    my ($self, $meth, $url, $content) = @_;
+    my ($self, $meth, $url, $content, $opts) = @_;
 
     if (!$meth || !$url) {
         croak "Method and URL are mandatory";
@@ -76,6 +90,9 @@ sub request {
     my $resp = $self->ua()->request($req);
 
     if ($resp->is_success()) {
+        if ($opts && $opts->{as_string}) {
+            return $resp->decoded_content();
+        }
         return decode_json($resp->decoded_content());
     }
     # TODO: Add reason handling.
